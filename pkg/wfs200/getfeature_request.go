@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/flywave/ogc-osgwo/pkg/utils"
-	"github.com/flywave/ogc-osgwo/pkg/wsc110"
+	"github.com/flywave/ogc-osgeo/pkg/utils"
+	"github.com/flywave/ogc-osgeo/pkg/wsc110"
 )
 
 // Contains the GetFeature struct and specific functions for building a GetFeature request

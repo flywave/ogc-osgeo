@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"regexp"
 
-	"github.com/flywave/ogc-osgwo/pkg/wsc200"
+	"github.com/flywave/ogc-osgeo/pkg/wsc200"
 )
 
 // Type function needed for the interface

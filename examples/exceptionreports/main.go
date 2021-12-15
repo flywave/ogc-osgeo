@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/flywave/ogc-osgwo/pkg/wfs200"
-	"github.com/flywave/ogc-osgwo/pkg/wms130"
-	"github.com/flywave/ogc-osgwo/pkg/wsc110"
+	"github.com/flywave/ogc-osgeo/pkg/wfs200"
+	"github.com/flywave/ogc-osgeo/pkg/wms130"
+	"github.com/flywave/ogc-osgeo/pkg/wsc110"
 )
 
 func main() {

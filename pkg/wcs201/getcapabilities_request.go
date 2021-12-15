@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/flywave/ogc-osgwo/pkg/utils"
-	"github.com/flywave/ogc-osgwo/pkg/wsc200"
+	"github.com/flywave/ogc-osgeo/pkg/utils"
+	"github.com/flywave/ogc-osgeo/pkg/wsc200"
 )
 
 // WCS 2.0.1 Tokens

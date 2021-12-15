@@ -1,8 +1,8 @@
 package wfs200
 
 import (
-	"github.com/flywave/ogc-osgwo/pkg/utils"
-	"github.com/flywave/ogc-osgwo/pkg/wsc110"
+	"github.com/flywave/ogc-osgeo/pkg/utils"
+	"github.com/flywave/ogc-osgeo/pkg/wsc110"
 )
 
 //

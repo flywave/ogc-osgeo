@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/flywave/ogc-osgwo/pkg/utils"
+	"github.com/flywave/ogc-osgeo/pkg/utils"
 )
 
 // GetCapabilitiesRequest struct with the needed parameters/attributes needed for making a GetCapabilities request

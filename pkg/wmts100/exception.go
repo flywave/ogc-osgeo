@@ -3,7 +3,7 @@ package wmts100
 import (
 	"encoding/xml"
 
-	"github.com/flywave/ogc-osgwo/pkg/wsc110"
+	"github.com/flywave/ogc-osgeo/pkg/wsc110"
 )
 
 type exception struct {

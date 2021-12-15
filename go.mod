@@ -1,4 +1,4 @@
-module github.com/flywave/ogc-osgwo
+module github.com/flywave/ogc-osgeo
 
 go 1.16
 

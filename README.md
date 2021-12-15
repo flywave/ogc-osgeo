@@ -1,10 +1,10 @@
-# ogc-osgwo
+# ogc-osgeo
 
-![GitHub license](https://img.shields.io/github/license/PDOK/ogc-osgwo)
-[![GitHub release](https://img.shields.io/github/release/PDOK/ogc-osgwo.svg)](https://github.com/PDOK/ogc-osgwo/releases)
-[![Go Report Card](https://goreportcard.com/badge/PDOK/ogc-osgwo)](https://goreportcard.com/report/PDOK/ogc-osgwo)
+![GitHub license](https://img.shields.io/github/license/PDOK/ogc-osgeo)
+[![GitHub release](https://img.shields.io/github/release/PDOK/ogc-osgeo.svg)](https://github.com/PDOK/ogc-osgeo/releases)
+[![Go Report Card](https://goreportcard.com/badge/PDOK/ogc-osgeo)](https://goreportcard.com/report/PDOK/ogc-osgeo)
 
-The package ogc-osgwo is a implementation of the OGC Web Service Specifications as defined by the [OGC](https://www.ogc.org/).
+The package ogc-osgeo is a implementation of the OGC Web Service Specifications as defined by the [OGC](https://www.ogc.org/).
 This package has support for the following OGC Web Service Specifications Operations:
 
 | Spec | Version | Operation | Request | Response |
@@ -43,14 +43,14 @@ This is still a 'work-in-progress' with the following major to do's:
 ## Installation
 
 ```go
-go get github.com/flywave/ogc-osgwo
+go get github.com/flywave/ogc-osgeo
 ```
 
 import a specific ogc specification like wms of wfs.
 
 ```import
-import wms "github.com/flywave/ogc-osgwo/pkg/wms"
-import wfs "github.com/flywave/ogc-osgwo/pkg/wfs"
+import wms "github.com/flywave/ogc-osgeo/pkg/wms"
+import wfs "github.com/flywave/ogc-osgeo/pkg/wfs"
 ```
 
 ## Test

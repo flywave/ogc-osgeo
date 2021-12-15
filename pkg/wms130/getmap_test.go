@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/flywave/ogc-osgwo/pkg/utils"
+	"github.com/flywave/ogc-osgeo/pkg/utils"
 )
 
 func TestBuildStyledLayerDescriptor(t *testing.T) {

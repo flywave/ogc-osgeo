@@ -1,6 +1,6 @@
 package wmts100
 
-import "github.com/flywave/ogc-osgwo/pkg/wsc110"
+import "github.com/flywave/ogc-osgeo/pkg/wsc110"
 
 // TileOutOfRange exception
 func TileOutOfRange() wsc110.Exception {
