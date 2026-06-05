@@ -3,7 +3,6 @@ package wmts100
 import (
 	"encoding/xml"
 	"net/url"
-	"regexp"
 	"strings"
 
 	"github.com/flywave/ogc-osgeo/pkg/utils"
@@ -12,10 +11,35 @@ import (
 
 // GetTileRequest struct with the needed parameters/attributes needed for making a GetTile request
 type GetTileRequest struct {
-	XMLName xml.Name           `xml:"GetTile" yaml:"gettile"`
-	Service string             `xml:"service,attr" yaml:"service"`
-	Version string             `xml:"version,attr" yaml:"version"`
-	Attr    utils.XMLAttribute `xml:",attr"`
+	XMLName            xml.Name           `xml:"GetTile" yaml:"gettile"`
+	Service            string             `xml:"service,attr" yaml:"service"`
+	Version            string             `xml:"version,attr" yaml:"version"`
+	Layer              string             `xml:"Layer" yaml:"layer"`
+	Style              string             `xml:"Style" yaml:"style"`
+	Format             string             `xml:"Format" yaml:"format"`
+	TileMatrixSet      string             `xml:"TileMatrixSet" yaml:"tilematrixset"`
+	TileMatrix         string             `xml:"TileMatrix" yaml:"tilematrix"`
+	TileRow            string             `xml:"TileRow" yaml:"tilerow"`
+	TileCol            string             `xml:"TileCol" yaml:"tilecol"`
+	DimensionNameValue []DimensionNameValue `xml:"DimensionNameValue,omitempty" yaml:"dimensionnamevalue"`
+	Attr               utils.XMLAttribute `xml:",attr"`
+}
+
+// Type returns GetTile
+func (gc GetTileRequest) Type() string {
+	return gettile
+}
+
+// Validate validates the GetTile request
+func (gc GetTileRequest) Validate(c wsc110.Capabilities) wsc110.Exceptions {
+	var exceptions wsc110.Exceptions
+	if gc.Layer == "" {
+		exceptions = append(exceptions, wsc110.MissingParameterValue("LAYER"))
+	}
+	if gc.TileMatrixSet == "" {
+		exceptions = append(exceptions, wsc110.MissingParameterValue("TILEMATRIXSET"))
+	}
+	return exceptions
 }
 
 // ParseXML builds a GetTile object based on a XML document
@@ -43,34 +67,44 @@ func (gc *GetTileRequest) ParseXML(body []byte) wsc110.Exceptions {
 
 // ParseQueryParameters builds a GetTile object based on the available query parameters
 func (gc *GetTileRequest) ParseQueryParameters(query url.Values) wsc110.Exceptions {
-	for k, v := range query {
-		switch strings.ToUpper(k) {
-		case REQUEST:
-			if strings.EqualFold(v[0], gettile) {
-				gc.XMLName.Local = gettile
-			}
-		case SERVICE:
-			gc.Service = strings.ToUpper(v[0])
-		case VERSION:
-			gc.Version = strings.ToUpper(v[0])
-		}
+	tpv := getTileRequestParameterValue{}
+
+	if exceptions := tpv.parseQueryParameters(query); exceptions != nil {
+		return exceptions
 	}
+
+	if exceptions := gc.parseGetTileRequestParameterValue(tpv); exceptions != nil {
+		return exceptions
+	}
+	return nil
+}
+
+func (gc *GetTileRequest) parseGetTileRequestParameterValue(tpv getTileRequestParameterValue) wsc110.Exceptions {
+	gc.XMLName.Local = gettile
+	gc.Service = Service
+	gc.Version = Version
+	gc.Layer = tpv.Layer
+	gc.Style = tpv.Style
+	gc.Format = tpv.Format
+	gc.TileMatrixSet = tpv.TileMatrixSet
+	gc.TileMatrix = tpv.TileMatrix
+	gc.TileRow = tpv.TileRow
+	gc.TileCol = tpv.TileCol
+	gc.DimensionNameValue = tpv.DimensionNameValue
 	return nil
 }
 
 // ToQueryParameters builds a new query string that will be proxied
 func (gc GetTileRequest) ToQueryParameters() url.Values {
-	querystring := make(map[string][]string)
-	querystring[REQUEST] = []string{gc.XMLName.Local}
-	querystring[SERVICE] = []string{gc.Service}
-	querystring[VERSION] = []string{gc.Version}
+	tpv := getTileRequestParameterValue{}
+	tpv.parseGetTileRequest(gc)
 
-	return querystring
+	q := tpv.toQueryParameters()
+	return q
 }
 
 // ToXML builds a 'new' XML document 'based' on the 'original' XML document
 func (gc GetTileRequest) ToXML() []byte {
-	si, _ := xml.MarshalIndent(gc, "", "")
-	re := regexp.MustCompile(`><.*>`)
-	return []byte(xml.Header + re.ReplaceAllString(string(si), "/>"))
+	si, _ := xml.Marshal(gc)
+	return append([]byte(xml.Header), si...)
 }

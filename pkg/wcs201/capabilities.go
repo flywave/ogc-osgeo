@@ -93,6 +93,10 @@ type Contents struct {
 
 // CoverageSummary in struct for repeatability
 type CoverageSummary struct {
-	CoverageID      string `xml:"wcs:CoverageId"`
-	CoverageSubtype string `xml:"wcs:CoverageSubtype"`
+	CoverageID      string   `xml:"wcs:CoverageId"`
+	CoverageSubtype string   `xml:"wcs:CoverageSubtype,omitempty"`
+	Title           string   `xml:"ows:Title,omitempty"`
+	Abstract        string   `xml:"ows:Abstract,omitempty"`
+	SupportedCRS    []string `xml:"wcs:SupportedCRS,omitempty"`
+	SupportedFormat []string `xml:"wcs:SupportedFormat,omitempty"`
 }

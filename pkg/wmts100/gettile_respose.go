@@ -2,7 +2,6 @@ package wmts100
 
 import (
 	"encoding/xml"
-	"regexp"
 
 	"github.com/flywave/ogc-osgeo/pkg/wsc110"
 )
@@ -29,9 +28,8 @@ func (gc GetTileResponse) Validate() wsc110.Exceptions {
 
 // ToXML builds a GetCapabilities response object
 func (gc GetTileResponse) ToXML() []byte {
-	si, _ := xml.MarshalIndent(gc, "", "")
-	re := regexp.MustCompile(`><.*>`)
-	return []byte(xml.Header + re.ReplaceAllString(string(si), "/>"))
+	si, _ := xml.Marshal(gc)
+	return append([]byte(xml.Header), si...)
 }
 
 type GetTileResponse struct {

@@ -18,6 +18,12 @@ type GetCapabilitiesRequest struct {
 // Validate returns GetCapabilities
 func (g *GetCapabilitiesRequest) Validate(c Capabilities) Exceptions {
 	var exceptions Exceptions
+	if g.Service != Service {
+		exceptions = append(exceptions, MissingParameterValue(SERVICE))
+	}
+	if g.Version == "" {
+		exceptions = append(exceptions, MissingParameterValue(VERSION))
+	}
 	return exceptions
 }
 

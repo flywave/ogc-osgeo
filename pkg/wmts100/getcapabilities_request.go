@@ -3,18 +3,10 @@ package wmts100
 import (
 	"encoding/xml"
 	"net/url"
-	"regexp"
 	"strings"
 
 	"github.com/flywave/ogc-osgeo/pkg/utils"
 	"github.com/flywave/ogc-osgeo/pkg/wsc110"
-)
-
-// WMTS 1.0.0 Tokens
-const (
-	SERVICE = `SERVICE`
-	REQUEST = `REQUEST`
-	VERSION = `VERSION`
 )
 
 // GetCapabilitiesRequest struct with the needed parameters/attributes needed for making a GetCapabilities request
@@ -23,6 +15,16 @@ type GetCapabilitiesRequest struct {
 	Service string             `xml:"service,attr" yaml:"service"`
 	Version string             `xml:"version,attr" yaml:"version"`
 	Attr    utils.XMLAttribute `xml:",attr"`
+}
+
+// Type returns GetCapabilities
+func (gc GetCapabilitiesRequest) Type() string {
+	return getcapabilities
+}
+
+// Validate validates the GetCapabilities request
+func (gc GetCapabilitiesRequest) Validate(c wsc110.Capabilities) wsc110.Exceptions {
+	return nil
 }
 
 // ParseXML builds a GetCapabilities object based on a XML document
@@ -50,34 +52,36 @@ func (gc *GetCapabilitiesRequest) ParseXML(body []byte) wsc110.Exceptions {
 
 // ParseQueryParameters builds a GetCapabilities object based on the available query parameters
 func (gc *GetCapabilitiesRequest) ParseQueryParameters(query url.Values) wsc110.Exceptions {
-	for k, v := range query {
-		switch strings.ToUpper(k) {
-		case REQUEST:
-			if strings.EqualFold(v[0], getcapabilities) {
-				gc.XMLName.Local = getcapabilities
-			}
-		case SERVICE:
-			gc.Service = strings.ToUpper(v[0])
-		case VERSION:
-			gc.Version = strings.ToUpper(v[0])
-		}
+	gpv := getCapabilitiesRequestParameterValue{}
+
+	if exceptions := gpv.parseQueryParameters(query); exceptions != nil {
+		return exceptions
 	}
+
+	if exceptions := gc.parseGetCapabilitiesRequestParameterValue(gpv); exceptions != nil {
+		return exceptions
+	}
+	return nil
+}
+
+func (gc *GetCapabilitiesRequest) parseGetCapabilitiesRequestParameterValue(gpv getCapabilitiesRequestParameterValue) wsc110.Exceptions {
+	gc.XMLName.Local = getcapabilities
+	gc.Service = Service
+	gc.Version = gpv.version
 	return nil
 }
 
 // ToQueryParameters builds a new query string that will be proxied
 func (gc GetCapabilitiesRequest) ToQueryParameters() url.Values {
-	querystring := make(map[string][]string)
-	querystring[REQUEST] = []string{gc.XMLName.Local}
-	querystring[SERVICE] = []string{gc.Service}
-	querystring[VERSION] = []string{gc.Version}
+	gpv := getCapabilitiesRequestParameterValue{}
+	gpv.parseGetCapabilitiesRequest(gc)
 
-	return querystring
+	q := gpv.toQueryParameters()
+	return q
 }
 
 // ToXML builds a 'new' XML document 'based' on the 'original' XML document
 func (gc GetCapabilitiesRequest) ToXML() []byte {
-	si, _ := xml.MarshalIndent(gc, "", "")
-	re := regexp.MustCompile(`><.*>`)
-	return []byte(xml.Header + re.ReplaceAllString(string(si), "/>"))
+	si, _ := xml.Marshal(gc)
+	return append([]byte(xml.Header), si...)
 }

@@ -163,14 +163,15 @@ func (output *Output) Validate(c Capabilities) Exceptions {
 		exceptions = append(exceptions, NoApplicableCode(fmt.Sprintf("Image size out of range, HEIGHT must be between 1 and %d pixels", c.MaxHeight)))
 	}
 
+	found := false
 	for _, format := range c.WMSCapabilities.Request.GetMap.Format {
-		found := false
 		if format == output.Format {
 			found = true
+			break
 		}
-		if !found {
-			exceptions = append(exceptions, InvalidFormat(output.Format))
-		}
+	}
+	if !found {
+		exceptions = append(exceptions, InvalidFormat(output.Format))
 	}
 
 	if exceptions != nil {

@@ -52,7 +52,13 @@ func (i *GetFeatureInfoRequest) Validate(c Capabilities) Exceptions {
 	var exceptions Exceptions
 
 	exceptions = append(exceptions, i.StyledLayerDescriptor.Validate(c)...)
-	// exceptions = append(exceptions, i.Output.Validate(wmsCapabilities)...)
+
+	if len(i.QueryLayers) == 0 {
+		exceptions = append(exceptions, MissingParameterValue(QUERYLAYERS))
+	}
+	if i.Version == "" {
+		exceptions = append(exceptions, MissingParameterValue(VERSION))
+	}
 
 	return exceptions
 }

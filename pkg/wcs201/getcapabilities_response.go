@@ -2,7 +2,6 @@ package wcs201
 
 import (
 	"encoding/xml"
-	"regexp"
 
 	"github.com/flywave/ogc-osgeo/pkg/wsc200"
 )
@@ -24,9 +23,8 @@ func (gc *GetCapabilitiesResponse) Version() string {
 
 // ToXML builds a GetCapabilities response object
 func (gc GetCapabilitiesResponse) ToXML() []byte {
-	si, _ := xml.MarshalIndent(gc, "", "")
-	re := regexp.MustCompile(`><.*>`)
-	return []byte(xml.Header + re.ReplaceAllString(string(si), "/>"))
+	si, _ := xml.Marshal(gc)
+	return append([]byte(xml.Header), si...)
 }
 
 // GetCapabilitiesResponse base struct

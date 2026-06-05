@@ -3,18 +3,10 @@ package wcs201
 import (
 	"encoding/xml"
 	"net/url"
-	"regexp"
 	"strings"
 
 	"github.com/flywave/ogc-osgeo/pkg/utils"
 	"github.com/flywave/ogc-osgeo/pkg/wsc200"
-)
-
-// WCS 2.0.1 Tokens
-const (
-	SERVICE = `SERVICE`
-	REQUEST = `REQUEST`
-	VERSION = `VERSION`
 )
 
 // Type returns GetCapabilities
@@ -79,9 +71,8 @@ func (gc *GetCapabilitiesRequest) ToQueryParameters() url.Values {
 
 // ToXML builds a 'new' XML document 'based' on the 'original' XML document
 func (gc GetCapabilitiesRequest) ToXML() []byte {
-	si, _ := xml.MarshalIndent(gc, "", "")
-	re := regexp.MustCompile(`><.*>`)
-	return []byte(xml.Header + re.ReplaceAllString(string(si), "/>"))
+	si, _ := xml.Marshal(gc)
+	return append([]byte(xml.Header), si...)
 }
 
 // GetCapabilitiesRequest struct with the needed parameters/attributes needed for making a GetCapabilities request

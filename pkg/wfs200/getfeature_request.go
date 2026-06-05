@@ -56,8 +56,15 @@ func (f GetFeatureRequest) Type() string {
 
 // Validate returns GetFeature
 func (f GetFeatureRequest) Validate(c wsc110.Capabilities) []wsc110.Exception {
+	var exceptions []wsc110.Exception
 
-	//getfeaturecap := c.(capabilities.Capabilities)
+	if f.Query.TypeNames == "" {
+		exceptions = append(exceptions, wsc110.MissingParameterValue(TYPENAMES))
+	}
+
+	if len(exceptions) > 0 {
+		return exceptions
+	}
 	return nil
 }
 

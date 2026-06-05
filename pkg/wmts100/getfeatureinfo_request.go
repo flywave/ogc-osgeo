@@ -3,22 +3,55 @@ package wmts100
 import (
 	"encoding/xml"
 	"net/url"
-	"regexp"
 	"strings"
 
 	"github.com/flywave/ogc-osgeo/pkg/utils"
 	"github.com/flywave/ogc-osgeo/pkg/wsc110"
 )
 
-// GetFeatureInfoRequest struct with the needed parameters/attributes needed for making a GetTile request
+// GetFeatureInfoRequest struct with the needed parameters/attributes needed for making a GetFeatureInfo request
 type GetFeatureInfoRequest struct {
-	XMLName xml.Name           `xml:"GetTile" yaml:"gettile"`
-	Service string             `xml:"service,attr" yaml:"service"`
-	Version string             `xml:"version,attr" yaml:"version"`
-	Attr    utils.XMLAttribute `xml:",attr"`
+	XMLName            xml.Name           `xml:"GetFeatureInfo" yaml:"getfeatureinfo"`
+	Service            string             `xml:"service,attr" yaml:"service"`
+	Version            string             `xml:"version,attr" yaml:"version"`
+	Layer              string             `xml:"Layer" yaml:"layer"`
+	Style              string             `xml:"Style" yaml:"style"`
+	Format             string             `xml:"Format" yaml:"format"`
+	TileMatrixSet      string             `xml:"TileMatrixSet" yaml:"tilematrixset"`
+	TileMatrix         string             `xml:"TileMatrix" yaml:"tilematrix"`
+	TileRow            string             `xml:"TileRow" yaml:"tilerow"`
+	TileCol            string             `xml:"TileCol" yaml:"tilecol"`
+	I                  string             `xml:"I" yaml:"i"`
+	J                  string             `xml:"J" yaml:"j"`
+	InfoFormat         string             `xml:"InfoFormat" yaml:"infoformat"`
+	DimensionNameValue []DimensionNameValue `xml:"DimensionNameValue,omitempty" yaml:"dimensionnamevalue"`
+	Attr               utils.XMLAttribute `xml:",attr"`
 }
 
-// ParseXML builds a GetTile object based on a XML document
+// Type returns GetFeatureInfo
+func (gc GetFeatureInfoRequest) Type() string {
+	return getfeatureinfo
+}
+
+// Validate validates the GetFeatureInfo request
+func (gc GetFeatureInfoRequest) Validate(c wsc110.Capabilities) wsc110.Exceptions {
+	var exceptions wsc110.Exceptions
+	if gc.Layer == "" {
+		exceptions = append(exceptions, wsc110.MissingParameterValue("LAYER"))
+	}
+	if gc.TileMatrixSet == "" {
+		exceptions = append(exceptions, wsc110.MissingParameterValue("TILEMATRIXSET"))
+	}
+	if gc.I == "" {
+		exceptions = append(exceptions, wsc110.MissingParameterValue("I"))
+	}
+	if gc.J == "" {
+		exceptions = append(exceptions, wsc110.MissingParameterValue("J"))
+	}
+	return exceptions
+}
+
+// ParseXML builds a GetFeatureInfo object based on a XML document
 func (gc *GetFeatureInfoRequest) ParseXML(body []byte) wsc110.Exceptions {
 	var xmlattributes utils.XMLAttribute
 	if err := xml.Unmarshal(body, &xmlattributes); err != nil {
@@ -41,36 +74,49 @@ func (gc *GetFeatureInfoRequest) ParseXML(body []byte) wsc110.Exceptions {
 	return nil
 }
 
-// ParseQueryParameters builds a GetTile object based on the available query parameters
+// ParseQueryParameters builds a GetFeatureInfo object based on the available query parameters
 func (gc *GetFeatureInfoRequest) ParseQueryParameters(query url.Values) wsc110.Exceptions {
-	for k, v := range query {
-		switch strings.ToUpper(k) {
-		case REQUEST:
-			if strings.EqualFold(v[0], getfeatureinfo) {
-				gc.XMLName.Local = getfeatureinfo
-			}
-		case SERVICE:
-			gc.Service = strings.ToUpper(v[0])
-		case VERSION:
-			gc.Version = strings.ToUpper(v[0])
-		}
+	fpv := getFeatureInfoRequestParameterValue{}
+
+	if exceptions := fpv.parseQueryParameters(query); exceptions != nil {
+		return exceptions
 	}
+
+	if exceptions := gc.parseGetFeatureInfoRequestParameterValue(fpv); exceptions != nil {
+		return exceptions
+	}
+	return nil
+}
+
+func (gc *GetFeatureInfoRequest) parseGetFeatureInfoRequestParameterValue(fpv getFeatureInfoRequestParameterValue) wsc110.Exceptions {
+	gc.XMLName.Local = getfeatureinfo
+	gc.Service = Service
+	gc.Version = Version
+	gc.Layer = fpv.Layer
+	gc.Style = fpv.Style
+	gc.Format = fpv.Format
+	gc.TileMatrixSet = fpv.TileMatrixSet
+	gc.TileMatrix = fpv.TileMatrix
+	gc.TileRow = fpv.TileRow
+	gc.TileCol = fpv.TileCol
+	gc.I = fpv.I
+	gc.J = fpv.J
+	gc.InfoFormat = fpv.InfoFormat
+	gc.DimensionNameValue = fpv.DimensionNameValue
 	return nil
 }
 
 // ToQueryParameters builds a new query string that will be proxied
 func (gc GetFeatureInfoRequest) ToQueryParameters() url.Values {
-	querystring := make(map[string][]string)
-	querystring[REQUEST] = []string{gc.XMLName.Local}
-	querystring[SERVICE] = []string{gc.Service}
-	querystring[VERSION] = []string{gc.Version}
+	fpv := getFeatureInfoRequestParameterValue{}
+	fpv.parseGetFeatureInfoRequest(gc)
 
-	return querystring
+	q := fpv.toQueryParameters()
+	return q
 }
 
 // ToXML builds a 'new' XML document 'based' on the 'original' XML document
 func (gc GetFeatureInfoRequest) ToXML() []byte {
-	si, _ := xml.MarshalIndent(gc, "", "")
-	re := regexp.MustCompile(`><.*>`)
-	return []byte(xml.Header + re.ReplaceAllString(string(si), "/>"))
+	si, _ := xml.Marshal(gc)
+	return append([]byte(xml.Header), si...)
 }
